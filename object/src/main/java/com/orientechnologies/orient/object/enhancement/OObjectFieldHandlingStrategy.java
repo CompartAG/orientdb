@@ -23,7 +23,7 @@ public interface OObjectFieldHandlingStrategy {
      * @param fieldValue
      * @param fieldType
      */
-    void save(ODocument iRecord, String fieldName, Object fieldValue, OType fieldType);
+    ODocument store(ODocument iRecord, String fieldName, Object fieldValue, OType fieldType);
 
     /**
      * Retrieve a field from a document

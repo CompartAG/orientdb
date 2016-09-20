@@ -1214,7 +1214,7 @@ public class OObjectEntitySerializer {
         }
         
         fieldValue = typeToStream(fieldValue, fieldType, db, iRecord);
-        OObjectFieldHandler.getStrategy().save(iRecord, fieldName, fieldValue, fieldType);
+        OObjectFieldHandler.getStrategy().store(iRecord, fieldName, fieldValue, fieldType);
       }
 
       currentClass = currentClass.getSuperclass();

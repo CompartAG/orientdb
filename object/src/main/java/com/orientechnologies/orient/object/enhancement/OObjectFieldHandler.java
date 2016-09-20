@@ -14,7 +14,7 @@ public class OObjectFieldHandler {
 
     private static final OObjectFieldHandlingStrategy STRATEGY;
     static {
-        STRATEGY = new SimpleOObjectFieldHandlingStrategy();
+        STRATEGY = new SmartOObjectFieldHandlingStrategy();
     }
 
     public static final OObjectFieldHandlingStrategy getStrategy() {
