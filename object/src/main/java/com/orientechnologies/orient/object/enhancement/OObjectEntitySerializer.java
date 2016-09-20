@@ -1212,10 +1212,9 @@ public class OObjectEntitySerializer {
             }
           }
         }
-
+        
         fieldValue = typeToStream(fieldValue, fieldType, db, iRecord);
-
-        iRecord.field(fieldName, fieldValue, fieldType);
+        OObjectFieldHandler.getStrategy().save(iRecord, fieldName, fieldValue, fieldType);
       }
 
       currentClass = currentClass.getSuperclass();
