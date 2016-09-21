@@ -21,18 +21,18 @@ public interface OObjectFieldHandlingStrategy {
      * @param iRecord
      * @param fieldName
      * @param fieldValue
-     * @param fieldType
+     * @param suggestedFieldType ignored if the type is set in the schema
      */
-    ODocument store(ODocument iRecord, String fieldName, Object fieldValue, OType fieldType);
+    ODocument store(ODocument iRecord, String fieldName, Object fieldValue, OType suggestedFieldType);
 
     /**
-     * Retrieve a field from a document
+     * Retrieves a field from a document
      * 
      * @param iRecord
      * @param fieldName
-     * @param fieldType
+     * @param suggestedFieldType ignored if the type is set in the schema
      * @return field value
      */
-    Object load(ODocument iRecord, String fieldName, OType fieldType);
+    Object load(ODocument iRecord, String fieldName, OType suggestedFieldType);
 
 }
