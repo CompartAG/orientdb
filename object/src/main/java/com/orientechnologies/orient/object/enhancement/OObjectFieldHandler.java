@@ -5,14 +5,18 @@
 
 package com.orientechnologies.orient.object.enhancement;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 
 /**
  * Wraps a {@link OObjectFieldHandlingStrategy} to be accessed statically.<br/>
  * The strategy to be used is set via {@link OGlobalConfiguration#OBJECT_BINARY_MAPPING} and the possible values are
  * {@link #SIMPLE},{@link #SINGLE_ORECORD_BYTES} or {@link #SPLIT_ORECORD_BYTES}.
  * 
- * @author dta
+ * @author dta@compart.com
  */
 public class OObjectFieldHandler {
 
@@ -22,16 +26,22 @@ public class OObjectFieldHandler {
 
     private static final OObjectFieldHandlingStrategy STRATEGY;
     static {
+        Map<OType, OObjectFieldOTypeHandlingStrategy> typeHandlingStrategies = new HashMap<OType, OObjectFieldOTypeHandlingStrategy>();
+
         switch (OGlobalConfiguration.OBJECT_BINARY_MAPPING.getValueAsInteger()) {
         case SINGLE_ORECORD_BYTES:
-            STRATEGY = new SmartOObjectFieldHandlingStrategy();
+            typeHandlingStrategies.put(OType.BINARY, new OObjectSingleRecordBytesOTypeHandlingStrategy());
             break;
-        case 2:
-        case 0:
+
+        case SPLIT_ORECORD_BYTES:
+            break;
+
+        case SIMPLE:
         default:
-            STRATEGY = new SimpleOObjectFieldHandlingStrategy();
             break;
         }
+
+        STRATEGY = new SmartOObjectFieldHandlingStrategy(typeHandlingStrategies);
     }
 
     public static final OObjectFieldHandlingStrategy getStrategy() {

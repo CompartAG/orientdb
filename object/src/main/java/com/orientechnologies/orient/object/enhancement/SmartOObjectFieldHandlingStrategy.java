@@ -5,9 +5,11 @@
 
 package com.orientechnologies.orient.object.enhancement;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 
 /**
  * {@link OObjectFieldHandlingStrategy} that deals with fields (depending on their type) in a smarter way than a
@@ -16,6 +18,27 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
  * @author dta@compart.com
  */
 public class SmartOObjectFieldHandlingStrategy extends SimpleOObjectFieldHandlingStrategy {
+
+    private final Map<OType, OObjectFieldOTypeHandlingStrategy> customTypeHandlers = new HashMap<OType, OObjectFieldOTypeHandlingStrategy>();
+
+    /**
+     * Constructor
+     * 
+     * @param typeHandlers
+     */
+    public SmartOObjectFieldHandlingStrategy(Map<OType, OObjectFieldOTypeHandlingStrategy> typeHandlers) {
+        this.customTypeHandlers.putAll(typeHandlers);
+
+        // Validate the strategy mappings
+        OObjectFieldOTypeHandlingStrategy currentStrategy;
+        for (OType oType : this.customTypeHandlers.keySet()) {
+            currentStrategy = this.customTypeHandlers.get(oType);
+            if (!oType.equals(currentStrategy.getOType())) {
+                throw new IllegalArgumentException(
+                        "Strategy " + currentStrategy.getClass() + " can not handle fields with type: " + oType);
+            }
+        }
+    }
 
     @Override
     public ODocument store(ODocument iRecord, String fieldName, Object fieldValue, OType suggestedFieldType) {
@@ -26,29 +49,11 @@ public class SmartOObjectFieldHandlingStrategy extends SimpleOObjectFieldHandlin
             return super.store(iRecord, fieldName, fieldValue, suggestedFieldType);
         }
 
-        switch (fieldType) {
-        case BINARY:
-            // Binary data optimization: http://orientdb.com/docs/2.2/Binary-Data.html
-            byte[] bytes = fieldValue != null ? (byte[]) fieldValue : null;
-            ORecordBytes recordBytes;
-            if ((recordBytes = iRecord.field(fieldName)) == null) {
-                // No data yet
-                recordBytes = new ORecordBytes();
-                iRecord.field(fieldName, recordBytes);
-            } else {
-                // There's already a document storing some binary data
-                recordBytes.clear();
-            }
-
-            if (bytes != null) {
-                recordBytes.fromStream(bytes);
-            }
-
-            return iRecord;
-
-        default:
-            return super.store(iRecord, fieldName, fieldValue, suggestedFieldType);
+        if (this.customTypeHandlers.containsKey(fieldType)) {
+            return this.customTypeHandlers.get(fieldType).store(iRecord, fieldName, fieldValue);
         }
+
+        return super.store(iRecord, fieldName, fieldValue, suggestedFieldType);
     }
 
     @Override
@@ -56,9 +61,8 @@ public class SmartOObjectFieldHandlingStrategy extends SimpleOObjectFieldHandlin
 
         OType fieldType = deriveFieldType(iRecord, fieldName, suggestedFieldType);
 
-        if (OType.BINARY.equals(fieldType)) {
-            ORecordBytes oRecordBytes = iRecord.field(fieldName);
-            return oRecordBytes != null ? oRecordBytes.toStream() : null;
+        if (this.customTypeHandlers.containsKey(fieldType)) {
+            return this.customTypeHandlers.get(fieldType).load(iRecord, fieldName);
         }
 
         return super.load(iRecord, fieldName, suggestedFieldType);
