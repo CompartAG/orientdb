@@ -22,11 +22,11 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
  * {@link OObjectFieldHandlingStrategy} that deals with fields (depending on their type) in a smarter way than a
- * {@link SimpleOObjectFieldHandlingStrategy}.
+ * {@link OObjectSimpleFieldHandlingStrategy}.
  * 
- * @author dta@compart.com
+ * @author diegomtassis <a href="mailto:dta@compart.com">Diego Martin Tassis</a>
  */
-public class SmartOObjectFieldHandlingStrategy extends SimpleOObjectFieldHandlingStrategy {
+public class OObjectSmartFieldHandlingStrategy extends OObjectSimpleFieldHandlingStrategy {
 
     private final Map<OType, OObjectFieldOTypeHandlingStrategy> customTypeHandlers = new HashMap<OType, OObjectFieldOTypeHandlingStrategy>();
 
@@ -35,7 +35,7 @@ public class SmartOObjectFieldHandlingStrategy extends SimpleOObjectFieldHandlin
      * 
      * @param typeHandlers
      */
-    public SmartOObjectFieldHandlingStrategy(Map<OType, OObjectFieldOTypeHandlingStrategy> typeHandlers) {
+    public OObjectSmartFieldHandlingStrategy(Map<OType, OObjectFieldOTypeHandlingStrategy> typeHandlers) {
         this.customTypeHandlers.putAll(typeHandlers);
 
         // Validate the strategy mappings

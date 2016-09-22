@@ -11,7 +11,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 /**
  * Strategy handling how to store and retrieve data in documents.
  * 
- * @author dta@compart.com
+ * @author diegomtassis <a href="mailto:dta@compart.com">Diego Martin Tassis</a>
  */
 public interface OObjectFieldOTypeHandlingStrategy {
 

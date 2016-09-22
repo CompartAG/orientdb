@@ -24,7 +24,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
  * The strategy to be used is set via {@link OGlobalConfiguration#OBJECT_BINARY_MAPPING} and the possible values are
  * {@link #SIMPLE},{@link #SINGLE_ORECORD_BYTES} or {@link #SPLIT_ORECORD_BYTES}.
  * 
- * @author dta@compart.com
+ * @author diegomtassis <a href="mailto:dta@compart.com">Diego Martin Tassis</a>
  */
 public class OObjectFieldHandler {
 
@@ -50,7 +50,7 @@ public class OObjectFieldHandler {
             break;
         }
 
-        STRATEGY = new SmartOObjectFieldHandlingStrategy(typeHandlingStrategies);
+        STRATEGY = new OObjectSmartFieldHandlingStrategy(typeHandlingStrategies);
     }
 
     public static final OObjectFieldHandlingStrategy getStrategy() {

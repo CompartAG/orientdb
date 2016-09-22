@@ -20,9 +20,9 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 /**
  * {@link OObjectFieldHandlingStrategy} that delegates to the default {@link ODocument#field(String)} implementation.
  * 
- * @author dta@compart.com
+ * @author diegomtassis <a href="mailto:dta@compart.com">Diego Martin Tassis</a>
  */
-public class SimpleOObjectFieldHandlingStrategy implements OObjectFieldHandlingStrategy {
+public class OObjectSimpleFieldHandlingStrategy implements OObjectFieldHandlingStrategy {
 
     @Override
     public ODocument store(ODocument iRecord, String fieldName, Object fieldValue, OType suggestedFieldType) {

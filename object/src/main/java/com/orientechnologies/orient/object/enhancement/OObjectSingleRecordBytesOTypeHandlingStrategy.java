@@ -22,7 +22,7 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
  * 
  * Binary data optimization: http://orientdb.com/docs/2.2/Binary-Data.html
  * 
- * @author dta@compart.com
+ * @author diegomtassis <a href="mailto:dta@compart.com">Diego Martin Tassis</a>
  */
 public class OObjectSingleRecordBytesOTypeHandlingStrategy implements OObjectFieldOTypeHandlingStrategy {
 
