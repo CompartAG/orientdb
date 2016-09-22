@@ -11,19 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.orientechnologies.orient.object.enhancement;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 
+/**
+ * {@link OObjectFieldOTypeHandlingStrategy} that stores each {@link OType#BINARY} object in a {@link ORecordBytes}.
+ * 
+ * Binary data optimization: http://orientdb.com/docs/2.2/Binary-Data.html
+ * 
+ * @author dta@compart.com
+ */
 public class OObjectSingleRecordBytesOTypeHandlingStrategy implements OObjectFieldOTypeHandlingStrategy {
 
     @Override
     public ODocument store(ODocument iRecord, String fieldName, Object fieldValue) {
 
-        // Binary data optimization: http://orientdb.com/docs/2.2/Binary-Data.html
         byte[] bytes = fieldValue != null ? (byte[]) fieldValue : null;
         ORecordBytes recordBytes;
         if ((recordBytes = iRecord.field(fieldName)) == null) {

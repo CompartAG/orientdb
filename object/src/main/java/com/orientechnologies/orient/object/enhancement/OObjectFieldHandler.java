@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.orientechnologies.orient.object.enhancement;
 
 import java.util.HashMap;
@@ -43,6 +42,7 @@ public class OObjectFieldHandler {
             break;
 
         case SPLIT_ORECORD_BYTES:
+            typeHandlingStrategies.put(OType.BINARY, new OObjectSplitRecordBytesOTypeHandlingStrategy());
             break;
 
         case SIMPLE:
