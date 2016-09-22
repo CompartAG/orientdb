@@ -81,10 +81,17 @@ public class OObjectSplitRecordBytesOTypeHandlingStrategy implements OObjectFiel
             database.declareIntent(new OIntentMassiveInsert());
             chunks = new ArrayList<ORID>();
             int offset = 0;
+            int nextChunkLength = this.chunkSize;
             while (offset < bytes.length) {
-                chunks.add(database.save(new ORecordBytes(Arrays.copyOfRange(bytes, offset, offset + this.chunkSize)))
+
+                if (offset + nextChunkLength > bytes.length) {
+                    // last chunk, and it's smaller than the predefined chunk size
+                    nextChunkLength = bytes.length - offset;
+                }
+
+                chunks.add(database.save(new ORecordBytes(Arrays.copyOfRange(bytes, offset, offset + nextChunkLength)))
                         .getIdentity());
-                offset += this.chunkSize;
+                offset += nextChunkLength;
             }
 
             iRecord.field(fieldName, chunks);
@@ -98,8 +105,8 @@ public class OObjectSplitRecordBytesOTypeHandlingStrategy implements OObjectFiel
     public Object load(ODocument iRecord, String fieldName) {
 
         iRecord.setLazyLoad(false);
-        ORecordBytes chunk;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ORecordBytes chunk;
 
         for (OIdentifiable id : (List<OIdentifiable>) iRecord.field(fieldName)) {
             chunk = (ORecordBytes) id.getRecord();
