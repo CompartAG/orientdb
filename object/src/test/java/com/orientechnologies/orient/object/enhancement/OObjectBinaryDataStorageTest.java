@@ -2,16 +2,13 @@ package com.orientechnologies.orient.object.enhancement;
 
 import java.io.IOException;
 
-import javax.persistence.Basic;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.object.db.OObjectDatabaseTx;
 
 /**
@@ -26,7 +23,7 @@ public class OObjectBinaryDataStorageTest {
         databaseTx = new OObjectDatabaseTx("memory:" + this.getClass().getSimpleName());
         databaseTx.create();
 
-        databaseTx.getEntityManager().registerEntityClass(ExactEntity.class);
+        databaseTx.getEntityManager().registerEntityClass(Driver.class);
     }
 
     @After
@@ -41,19 +38,18 @@ public class OObjectBinaryDataStorageTest {
         OGlobalConfiguration.OBJECT_BINARY_MAPPING.setValue(OObjectFieldHandler.SIMPLE);
 
         Driver hunt = new Driver();
-        hunt.name = "James Hunt";
-        hunt.nationality = "british";
-        hunt.randomData = "qrtonvpeoitunbpweoirutvnüpoeqirüw".getBytes();
+        hunt.setName("James Hunt");
+        hunt.setImageData("qrtonvpeoitunbpweoirutvnüpoeqirüw".getBytes());
 
         // exercise
         Driver savedHunt = this.databaseTx.save(hunt);
-        Driver loadedHunt = this.databaseTx.load(savedHunt.id);
+        Driver loadedHunt = this.databaseTx.load(new ORecordId(savedHunt.getId()));
 
         // verify
         Assert.assertNotNull(savedHunt);
         Assert.assertNotNull(loadedHunt);
-        Assert.assertArrayEquals(savedHunt.randomData, hunt.randomData);
-        Assert.assertArrayEquals(loadedHunt.randomData, hunt.randomData);
+        Assert.assertArrayEquals(savedHunt.getImageData(), hunt.getImageData());
+        Assert.assertArrayEquals(loadedHunt.getImageData(), hunt.getImageData());
     }
 
     @Test
@@ -63,19 +59,18 @@ public class OObjectBinaryDataStorageTest {
         OGlobalConfiguration.OBJECT_BINARY_MAPPING.setValue(OObjectFieldHandler.SINGLE_ORECORD_BYTES);
 
         Driver lauda = new Driver();
-        lauda.name = "Niki Lauda";
-        lauda.nationality = "austrian";
-        lauda.randomData = "qelicuhewiryvqbewiournqcowuiepoxehqhew94387213bc47456cb0987".getBytes();
+        lauda.setName("Niki Lauda");
+        lauda.setImageData("qelicuhewiryvqbewiournqcowuiepoxehqhew94387213bc47456cb0987".getBytes());
 
         // exercise
         Driver savedLauda = this.databaseTx.save(lauda);
-        Driver loadedLauda = this.databaseTx.load(savedLauda.id);
+        Driver loadedLauda = this.databaseTx.load(new ORecordId(savedLauda.getId()));
 
         // verify
         Assert.assertNotNull(savedLauda);
         Assert.assertNotNull(loadedLauda);
-        Assert.assertArrayEquals(savedLauda.randomData, lauda.randomData);
-        Assert.assertArrayEquals(loadedLauda.randomData, lauda.randomData);
+        Assert.assertArrayEquals(savedLauda.getImageData(), lauda.getImageData());
+        Assert.assertArrayEquals(loadedLauda.getImageData(), lauda.getImageData());
     }
 
     @Test
@@ -85,37 +80,17 @@ public class OObjectBinaryDataStorageTest {
         OGlobalConfiguration.OBJECT_BINARY_MAPPING.setValue(OObjectFieldHandler.SPLIT_ORECORD_BYTES);
 
         Driver prost = new Driver();
-        prost.name = "Alain Prost";
-        prost.nationality = "french";
-        prost.randomData = "19348750193847b0v983by4tiwuervbc34crc234098cynxfwef".getBytes();
+        prost.setName("Alain Prost");
+        prost.setImageData("19348750193847b0v983by4tiwuervbc34crc234098cynxfwef".getBytes());
 
         // exercise
         Driver savedProst = this.databaseTx.save(prost);
-        Driver loadedProst = this.databaseTx.load(savedProst.id);
+        Driver loadedProst = this.databaseTx.load(new ORecordId(savedProst.getId()));
 
         // verify
         Assert.assertNotNull(savedProst);
         Assert.assertNotNull(loadedProst);
-        Assert.assertArrayEquals(savedProst.randomData, prost.randomData);
-        Assert.assertArrayEquals(loadedProst.randomData, prost.randomData);
-    }
-
-    public static class Driver {
-
-        @Id
-        public String id;
-
-        @Basic
-        public String name;
-
-        @Basic
-        public String nationality;
-
-        @Basic
-        public String team;
-
-        @Basic
-        @Lob
-        public byte[] randomData;
+        Assert.assertArrayEquals(savedProst.getImageData(), prost.getImageData());
+        Assert.assertArrayEquals(loadedProst.getImageData(), prost.getImageData());
     }
 }
