@@ -39,7 +39,7 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
  */
 public class OObjectSplitRecordBytesOTypeHandlingStrategy implements OObjectFieldOTypeHandlingStrategy {
 
-    private static final int DEFAULT_CHUNK_SIZE = 48;
+    private static final int DEFAULT_CHUNK_SIZE = 64;
     private static final int BYTES_PER_KB = 1024;
 
     private final int chunkSize;

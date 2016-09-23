@@ -40,7 +40,7 @@ public class OObjectBinaryDataStorageTest {
 
         Driver hunt = new Driver();
         hunt.setName("James Hunt");
-        byte[] huntUglyPicture = randomBytes(1024);
+        byte[] huntUglyPicture = randomBytes(1024 * 32);
         hunt.setImageData(huntUglyPicture);
 
         // exercise
@@ -63,7 +63,7 @@ public class OObjectBinaryDataStorageTest {
 
         Driver lauda = new Driver();
         lauda.setName("Niki Lauda");
-        byte[] laudaRealisticPicture = randomBytes(4096);
+        byte[] laudaRealisticPicture = randomBytes(1024 * 64);
         lauda.setImageData(laudaRealisticPicture);
 
         // exercise
@@ -86,7 +86,7 @@ public class OObjectBinaryDataStorageTest {
 
         Driver prost = new Driver();
         prost.setName("Alain Prost");
-        byte[] prostUglyPicture = randomBytes(4096);
+        byte[] prostUglyPicture = randomBytes(1024 * 128 + 1);
         prost.setImageData(prostUglyPicture);
 
         // exercise
