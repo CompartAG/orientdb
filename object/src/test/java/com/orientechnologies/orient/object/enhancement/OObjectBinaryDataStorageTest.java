@@ -1,6 +1,7 @@
 package com.orientechnologies.orient.object.enhancement;
 
 import java.io.IOException;
+import java.util.Random;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -39,7 +40,8 @@ public class OObjectBinaryDataStorageTest {
 
         Driver hunt = new Driver();
         hunt.setName("James Hunt");
-        hunt.setImageData("qrtonvpeoitunbpweoirutvnüpoeqirüw".getBytes());
+        byte[] huntUglyPicture = randomBytes(1024);
+        hunt.setImageData(huntUglyPicture);
 
         // exercise
         Driver savedHunt = this.databaseTx.save(hunt);
@@ -48,8 +50,9 @@ public class OObjectBinaryDataStorageTest {
         // verify
         Assert.assertNotNull(savedHunt);
         Assert.assertNotNull(loadedHunt);
-        Assert.assertArrayEquals(savedHunt.getImageData(), hunt.getImageData());
-        Assert.assertArrayEquals(loadedHunt.getImageData(), hunt.getImageData());
+        Assert.assertArrayEquals(huntUglyPicture, hunt.getImageData());
+        Assert.assertArrayEquals(huntUglyPicture, savedHunt.getImageData());
+        Assert.assertArrayEquals(huntUglyPicture, loadedHunt.getImageData());
     }
 
     @Test
@@ -60,7 +63,8 @@ public class OObjectBinaryDataStorageTest {
 
         Driver lauda = new Driver();
         lauda.setName("Niki Lauda");
-        lauda.setImageData("qelicuhewiryvqbewiournqcowuiepoxehqhew94387213bc47456cb0987".getBytes());
+        byte[] laudaRealisticPicture = randomBytes(4096);
+        lauda.setImageData(laudaRealisticPicture);
 
         // exercise
         Driver savedLauda = this.databaseTx.save(lauda);
@@ -69,8 +73,9 @@ public class OObjectBinaryDataStorageTest {
         // verify
         Assert.assertNotNull(savedLauda);
         Assert.assertNotNull(loadedLauda);
-        Assert.assertArrayEquals(savedLauda.getImageData(), lauda.getImageData());
-        Assert.assertArrayEquals(loadedLauda.getImageData(), lauda.getImageData());
+        Assert.assertArrayEquals(laudaRealisticPicture, lauda.getImageData());
+        Assert.assertArrayEquals(laudaRealisticPicture, savedLauda.getImageData());
+        Assert.assertArrayEquals(laudaRealisticPicture, loadedLauda.getImageData());
     }
 
     @Test
@@ -81,7 +86,8 @@ public class OObjectBinaryDataStorageTest {
 
         Driver prost = new Driver();
         prost.setName("Alain Prost");
-        prost.setImageData("19348750193847b0v983by4tiwuervbc34crc234098cynxfwef".getBytes());
+        byte[] prostUglyPicture = randomBytes(4096);
+        prost.setImageData(prostUglyPicture);
 
         // exercise
         Driver savedProst = this.databaseTx.save(prost);
@@ -90,7 +96,16 @@ public class OObjectBinaryDataStorageTest {
         // verify
         Assert.assertNotNull(savedProst);
         Assert.assertNotNull(loadedProst);
-        Assert.assertArrayEquals(savedProst.getImageData(), prost.getImageData());
-        Assert.assertArrayEquals(loadedProst.getImageData(), prost.getImageData());
+        Assert.assertArrayEquals(prostUglyPicture, prost.getImageData());
+        Assert.assertArrayEquals(prostUglyPicture, savedProst.getImageData());
+        Assert.assertArrayEquals(prostUglyPicture, loadedProst.getImageData());
+    }
+
+    private byte[] randomBytes(int size) {
+
+        byte[] b = new byte[size];
+        new Random().nextBytes(b);
+
+        return b;
     }
 }
