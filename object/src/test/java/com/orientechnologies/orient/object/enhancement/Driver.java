@@ -25,37 +25,37 @@ import javax.persistence.Lob;
  */
 public class Driver {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    @Basic
-    private String name;
+  @Basic
+  private String name;
 
-    @Basic
-    @Lob
-    private byte[] imageData;
+  @Basic
+  @Lob
+  private byte[] imageData;
 
-    public String getId() {
-        return this.id;
-    }
+  public String getId() {
+    return this.id;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public String getName() {
-        return this.name;
-    }
+  public String getName() {
+    return this.name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public byte[] getImageData() {
-        return this.imageData;
-    }
+  public byte[] getImageData() {
+    return this.imageData;
+  }
 
-    public void setImageData(byte[] imageData) {
-        this.imageData = imageData;
-    }
+  public void setImageData(byte[] imageData) {
+    this.imageData = imageData;
+  }
 }

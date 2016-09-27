@@ -30,8 +30,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 
 /**
- * {@link OObjectFieldOTypeHandlingStrategy} that stores each {@link OType#BINARY} object split in several
- * {@link ORecordBytes}.
+ * {@link OObjectFieldOTypeHandlingStrategy} that stores each {@link OType#BINARY} object split in several {@link ORecordBytes}.
  * 
  * Binary data optimization: http://orientdb.com/docs/2.2/Binary-Data.html
  * 
@@ -39,91 +38,89 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
  */
 public class OObjectSplitRecordBytesOTypeHandlingStrategy implements OObjectFieldOTypeHandlingStrategy {
 
-    private static final int DEFAULT_CHUNK_SIZE = 64;
-    private static final int BYTES_PER_KB = 1024;
+  private static final int DEFAULT_CHUNK_SIZE = 64;
+  private static final int BYTES_PER_KB       = 1024;
 
-    private final int chunkSize;
+  private final int        chunkSize;
 
-    /**
-     * Constuctor. Chunk size = {@value #DEFAULT_CHUNK_SIZE}
-     */
-    public OObjectSplitRecordBytesOTypeHandlingStrategy() {
-        this(DEFAULT_CHUNK_SIZE);
+  /**
+   * Constuctor. Chunk size = {@value #DEFAULT_CHUNK_SIZE}
+   */
+  public OObjectSplitRecordBytesOTypeHandlingStrategy() {
+    this(DEFAULT_CHUNK_SIZE);
+  }
+
+  /**
+   * Constructor
+   * 
+   * @param chunkSizeInKb
+   */
+  public OObjectSplitRecordBytesOTypeHandlingStrategy(int chunkSizeInKb) {
+    this.chunkSize = chunkSizeInKb * BYTES_PER_KB;
+  }
+
+  @Override
+  public ODocument store(ODocument iRecord, String fieldName, Object fieldValue) {
+
+    byte[] bytes = fieldValue != null ? (byte[]) fieldValue : null;
+    ODatabaseDocumentInternal database = iRecord.getDatabase();
+    List<ORID> chunks;
+
+    // Delete the current data
+    if ((chunks = iRecord.field(fieldName)) != null) {
+      // There's already some binary data stored
+      for (ORID oRid : chunks) {
+        database.delete(oRid);
+      }
+      iRecord.removeField(fieldName);
     }
 
-    /**
-     * Constructor
-     * 
-     * @param chunkSizeInKb
-     */
-    public OObjectSplitRecordBytesOTypeHandlingStrategy(int chunkSizeInKb) {
-        this.chunkSize = chunkSizeInKb * BYTES_PER_KB;
-    }
+    // Store new data
+    if (bytes != null) {
+      database.declareIntent(new OIntentMassiveInsert());
+      chunks = new ArrayList<ORID>();
+      int offset = 0;
+      int nextChunkLength = this.chunkSize;
+      while (offset < bytes.length) {
 
-    @Override
-    public ODocument store(ODocument iRecord, String fieldName, Object fieldValue) {
-
-        byte[] bytes = fieldValue != null ? (byte[]) fieldValue : null;
-        ODatabaseDocumentInternal database = iRecord.getDatabase();
-        List<ORID> chunks;
-
-        // Delete the current data
-        if ((chunks = iRecord.field(fieldName)) != null) {
-            // There's already some binary data stored
-            for (ORID oRid : chunks) {
-                database.delete(oRid);
-            }
-            iRecord.removeField(fieldName);
+        if (offset + nextChunkLength > bytes.length) {
+          // last chunk, and it's smaller than the predefined chunk size
+          nextChunkLength = bytes.length - offset;
         }
 
-        // Store new data
-        if (bytes != null) {
-            database.declareIntent(new OIntentMassiveInsert());
-            chunks = new ArrayList<ORID>();
-            int offset = 0;
-            int nextChunkLength = this.chunkSize;
-            while (offset < bytes.length) {
+        chunks.add(database.save(new ORecordBytes(Arrays.copyOfRange(bytes, offset, offset + nextChunkLength))).getIdentity());
+        offset += nextChunkLength;
+      }
 
-                if (offset + nextChunkLength > bytes.length) {
-                    // last chunk, and it's smaller than the predefined chunk size
-                    nextChunkLength = bytes.length - offset;
-                }
-
-                chunks.add(database.save(new ORecordBytes(Arrays.copyOfRange(bytes, offset, offset + nextChunkLength)))
-                        .getIdentity());
-                offset += nextChunkLength;
-            }
-
-            iRecord.field(fieldName, chunks);
-            database.declareIntent(null);
-        }
-
-        return iRecord;
+      iRecord.field(fieldName, chunks);
+      database.declareIntent(null);
     }
 
-    @Override
-    public Object load(ODocument iRecord, String fieldName) {
+    return iRecord;
+  }
 
-        iRecord.setLazyLoad(false);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ORecordBytes chunk;
+  @Override
+  public Object load(ODocument iRecord, String fieldName) {
 
-        for (OIdentifiable id : (List<OIdentifiable>) iRecord.field(fieldName)) {
-            chunk = (ORecordBytes) id.getRecord();
-            try {
-                chunk.toOutputStream(outputStream);
-            } catch (IOException e) {
-                throw OException.wrapException(new OSerializationException("Error loading binary field " + fieldName),
-                        e);
-            }
-            chunk.unload();
-        }
+    iRecord.setLazyLoad(false);
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    ORecordBytes chunk;
 
-        return outputStream.toByteArray();
+    for (OIdentifiable id : (List<OIdentifiable>) iRecord.field(fieldName)) {
+      chunk = (ORecordBytes) id.getRecord();
+      try {
+        chunk.toOutputStream(outputStream);
+      } catch (IOException e) {
+        throw OException.wrapException(new OSerializationException("Error loading binary field " + fieldName), e);
+      }
+      chunk.unload();
     }
 
-    @Override
-    public OType getOType() {
-        return OType.BINARY;
-    }
+    return outputStream.toByteArray();
+  }
+
+  @Override
+  public OType getOType() {
+    return OType.BINARY;
+  }
 }

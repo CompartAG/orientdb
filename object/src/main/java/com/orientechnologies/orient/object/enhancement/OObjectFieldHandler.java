@@ -28,32 +28,32 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
  */
 public class OObjectFieldHandler {
 
-    public static final int SIMPLE = 0;
-    public static final int SINGLE_ORECORD_BYTES = 1;
-    public static final int SPLIT_ORECORD_BYTES = 2;
+  public static final int                           SIMPLE               = 0;
+  public static final int                           SINGLE_ORECORD_BYTES = 1;
+  public static final int                           SPLIT_ORECORD_BYTES  = 2;
 
-    private static final OObjectFieldHandlingStrategy STRATEGY;
-    static {
-        Map<OType, OObjectFieldOTypeHandlingStrategy> typeHandlingStrategies = new HashMap<OType, OObjectFieldOTypeHandlingStrategy>();
+  private static final OObjectFieldHandlingStrategy STRATEGY;
+  static {
+    Map<OType, OObjectFieldOTypeHandlingStrategy> typeHandlingStrategies = new HashMap<OType, OObjectFieldOTypeHandlingStrategy>();
 
-        switch (OGlobalConfiguration.OBJECT_BINARY_MAPPING.getValueAsInteger()) {
-        case SINGLE_ORECORD_BYTES:
-            typeHandlingStrategies.put(OType.BINARY, new OObjectSingleRecordBytesOTypeHandlingStrategy());
-            break;
+    switch (OGlobalConfiguration.OBJECT_BINARY_MAPPING.getValueAsInteger()) {
+    case SINGLE_ORECORD_BYTES:
+      typeHandlingStrategies.put(OType.BINARY, new OObjectSingleRecordBytesOTypeHandlingStrategy());
+      break;
 
-        case SPLIT_ORECORD_BYTES:
-            typeHandlingStrategies.put(OType.BINARY, new OObjectSplitRecordBytesOTypeHandlingStrategy());
-            break;
+    case SPLIT_ORECORD_BYTES:
+      typeHandlingStrategies.put(OType.BINARY, new OObjectSplitRecordBytesOTypeHandlingStrategy());
+      break;
 
-        case SIMPLE:
-        default:
-            break;
-        }
-
-        STRATEGY = new OObjectSmartFieldHandlingStrategy(typeHandlingStrategies);
+    case SIMPLE:
+    default:
+      break;
     }
 
-    public static final OObjectFieldHandlingStrategy getStrategy() {
-        return STRATEGY;
-    }
+    STRATEGY = new OObjectSmartFieldHandlingStrategy(typeHandlingStrategies);
+  }
+
+  public static final OObjectFieldHandlingStrategy getStrategy() {
+    return STRATEGY;
+  }
 }

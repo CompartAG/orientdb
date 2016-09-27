@@ -28,52 +28,51 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
  */
 public class OObjectSmartFieldHandlingStrategy extends OObjectSimpleFieldHandlingStrategy {
 
-    private final Map<OType, OObjectFieldOTypeHandlingStrategy> customTypeHandlers = new HashMap<OType, OObjectFieldOTypeHandlingStrategy>();
+  private final Map<OType, OObjectFieldOTypeHandlingStrategy> customTypeHandlers = new HashMap<OType, OObjectFieldOTypeHandlingStrategy>();
 
-    /**
-     * Constructor
-     * 
-     * @param typeHandlers
-     */
-    public OObjectSmartFieldHandlingStrategy(Map<OType, OObjectFieldOTypeHandlingStrategy> typeHandlers) {
-        this.customTypeHandlers.putAll(typeHandlers);
+  /**
+   * Constructor
+   * 
+   * @param typeHandlers
+   */
+  public OObjectSmartFieldHandlingStrategy(Map<OType, OObjectFieldOTypeHandlingStrategy> typeHandlers) {
+    this.customTypeHandlers.putAll(typeHandlers);
 
-        // Validate the strategy mappings
-        OObjectFieldOTypeHandlingStrategy currentStrategy;
-        for (OType oType : this.customTypeHandlers.keySet()) {
-            currentStrategy = this.customTypeHandlers.get(oType);
-            if (!oType.equals(currentStrategy.getOType())) {
-                throw new IllegalArgumentException(
-                        "Strategy " + currentStrategy.getClass() + " can not handle fields with type: " + oType);
-            }
-        }
+    // Validate the strategy mappings
+    OObjectFieldOTypeHandlingStrategy currentStrategy;
+    for (OType oType : this.customTypeHandlers.keySet()) {
+      currentStrategy = this.customTypeHandlers.get(oType);
+      if (!oType.equals(currentStrategy.getOType())) {
+        throw new IllegalArgumentException("Strategy " + currentStrategy.getClass() + " can not handle fields with type: " + oType);
+      }
+    }
+  }
+
+  @Override
+  public ODocument store(ODocument iRecord, String fieldName, Object fieldValue, OType suggestedFieldType) {
+
+    OType fieldType = deriveFieldType(iRecord, fieldName, suggestedFieldType);
+
+    if (fieldType == null) {
+      return super.store(iRecord, fieldName, fieldValue, suggestedFieldType);
     }
 
-    @Override
-    public ODocument store(ODocument iRecord, String fieldName, Object fieldValue, OType suggestedFieldType) {
-
-        OType fieldType = deriveFieldType(iRecord, fieldName, suggestedFieldType);
-
-        if (fieldType == null) {
-            return super.store(iRecord, fieldName, fieldValue, suggestedFieldType);
-        }
-
-        if (this.customTypeHandlers.containsKey(fieldType)) {
-            return this.customTypeHandlers.get(fieldType).store(iRecord, fieldName, fieldValue);
-        }
-
-        return super.store(iRecord, fieldName, fieldValue, suggestedFieldType);
+    if (this.customTypeHandlers.containsKey(fieldType)) {
+      return this.customTypeHandlers.get(fieldType).store(iRecord, fieldName, fieldValue);
     }
 
-    @Override
-    public Object load(ODocument iRecord, String fieldName, OType suggestedFieldType) {
+    return super.store(iRecord, fieldName, fieldValue, suggestedFieldType);
+  }
 
-        OType fieldType = deriveFieldType(iRecord, fieldName, suggestedFieldType);
+  @Override
+  public Object load(ODocument iRecord, String fieldName, OType suggestedFieldType) {
 
-        if (this.customTypeHandlers.containsKey(fieldType)) {
-            return this.customTypeHandlers.get(fieldType).load(iRecord, fieldName);
-        }
+    OType fieldType = deriveFieldType(iRecord, fieldName, suggestedFieldType);
 
-        return super.load(iRecord, fieldName, suggestedFieldType);
+    if (this.customTypeHandlers.containsKey(fieldType)) {
+      return this.customTypeHandlers.get(fieldType).load(iRecord, fieldName);
     }
+
+    return super.load(iRecord, fieldName, suggestedFieldType);
+  }
 }
