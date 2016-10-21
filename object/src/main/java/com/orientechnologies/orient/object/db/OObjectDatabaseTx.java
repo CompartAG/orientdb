@@ -129,6 +129,7 @@ public class OObjectDatabaseTx extends ODatabasePojoAbstract<Object> implements 
     entityManager.registerEntityClass(OUser.class);
     entityManager.registerEntityClass(ORole.class);
     metadata = new OMetadataObject((OMetadataInternal) underlying.getMetadata());
+    this.registerFieldMappingStrategy();
     return (THISDB) this;
   }
 
@@ -138,6 +139,7 @@ public class OObjectDatabaseTx extends ODatabasePojoAbstract<Object> implements 
     entityManager.registerEntityClass(OUser.class);
     entityManager.registerEntityClass(ORole.class);
     metadata = new OMetadataObject((OMetadataInternal) underlying.getMetadata());
+    this.registerFieldMappingStrategy();
     return (THISDB) this;
   }
 
@@ -866,8 +868,6 @@ public class OObjectDatabaseTx extends ODatabasePojoAbstract<Object> implements 
       entityManager.registerEntityClass(OUser.class);
       entityManager.registerEntityClass(ORole.class);
     }
-
-    this.registerFieldMappingStrategy();
   }
 
   protected void deleteOrphans(final OObjectProxyMethodHandler handler) {
@@ -970,9 +970,13 @@ public class OObjectDatabaseTx extends ODatabasePojoAbstract<Object> implements 
     }
   }
 
+  /**
+   * Register the static document binary mapping mode in the database context (only if it's not already set)
+   */
   private void registerFieldMappingStrategy() {
-    this.getConfiguration().setValue(OGlobalConfiguration.DOCUMENT_BINARY_MAPPING,
-        OGlobalConfiguration.DOCUMENT_BINARY_MAPPING.getValueAsInteger());
+    if (!this.getConfiguration().getContextKeys().contains(OGlobalConfiguration.DOCUMENT_BINARY_MAPPING.getKey())) {
+      this.getConfiguration().setValue(OGlobalConfiguration.DOCUMENT_BINARY_MAPPING,
+          OGlobalConfiguration.DOCUMENT_BINARY_MAPPING.getValueAsInteger());
+    }
   }
-
 }
